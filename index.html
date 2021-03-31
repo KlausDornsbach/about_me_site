@@ -1,128 +1,208 @@
 <!DOCTYPE html>
-<meta charset = "UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
 <head>
-    <link rel="stylesheet" href="style.css">
-    <title>conheça Klaus</title>
+	<link rel="stylesheet" href="style.css">
+	<title>conheça Klaus</title>
 </head>
 
 <body>
-    <div class="navigation-pane">
-        <ul>
-            <li>Interesses</li>
-            <li>História</li>
-            <li>Experiência</li>
-        </ul>
-        <h1> Um pouco sobre Klaus Dornsbach</h1>
-    </div>
-    <h2 class="interesses"> Interesses:</h2>
-    <canvas id="myCanvas" width="600" height="400">
-        Your browser does not support the HTML canvas tag.</canvas>
-    <script>
-        var myGamePiece;
-        var myObstacles = [];
-        var myScore;
-        function startGame() {
-            myGamePiece = new component(30, 30, "white", 10, 120);
-            myScore = new component("30px", "Consolas", "white", 280, 40, "text");
-            myGameArea.start();
-            document.addEventListener('keypress', handleKeyPress);
-            document.addEventListener('keyup', handleKeyUp);
+	<div class="navigation-pane">
+		<ul>
+			<li>Interesses</li>
+			<li>História</li>
+			<li>Experiência</li>
+		</ul>
+		<h1> Um pouco sobre Klaus Dornsbach</h1>
+	</div>
+	<h2 class="interesses"> Interesses:</h2>
+	<canvas id="myCanvas" width="600" height="400">
+		Your browser does not support the HTML canvas tag.</canvas>
+	<script>
+		var myInterests = [{videogames: "adoro tudo relacionado a games e desenvolvimento destes"}, 
+							{desenvolvimento: "gosto de aprender novas formas de resolver problemas"},
+							{cresimento: "me amarro em desafios que me proporcionem aprendizado"},
+							{linguagens: "linguagens em que já desenvolvi: Python, Java, C/C++, JavaScript, HTML/CSS"},
+							{BDO: "já desenvolvi projetos com banco de dados Postgres e Firestore"},
+							{Cloud: "já desenvolvi projetos utilizando a plataforma AWS"}];
+		var myGamePiece;
+		var myObstacles = [];
+		var myShots = [];
+		var myScore;
+		function startGame() {
+			myGamePiece = new component(30, 30, "white", 10, 120);
+			myScore = new component("30px", "Consolas", "white", 280, 40, "text");
+			myGameArea.start();
+			document.addEventListener('keypress', handleKeyPress);
+			document.addEventListener('keyup', handleKeyUp);
 
-        }
-        function handleKeyPress(e) {
-          //alert(e.keyCode)
-          if(e.keyCode == 119) {
-              myGamePiece.speedY = -10;
-          }
-          if(e.keyCode == 115) {
-              myGamePiece.speedY = +10;
-          }
-        }
-        function handleKeyUp(e) {
-          myGamePiece.speedY = 0;
-        }
-        var myGameArea = {
-          canvas: document.getElementById("myCanvas"),
-          start: function() {
-              console.log("enter start");
-              this.context = this.canvas.getContext("2d");
-              this.frameNo = 0;
-              this.interval = setInterval(updateGameArea, 20);
-          },
-          clear: function() {
-              this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-          }
-        }
-        function component(width, height, color, x, y, type) {
-            this.type = type;
-            this.score = 0;
-            this.width = width;
-            this.height = height;
-            this.speedX = 0;
-            this.speedY = 0;
-            this.x = x;
-            this.y = y;
-            this.update = function() {
-              ctx = myGameArea.context;
-              if (this.type == "text") {
-                  ctx.font = this.width + " " + this.height;
-                  ctx.fillStyle = color;
-                  ctx.fillText(this.text, this.x, this.y);
-              } else {
-                  ctx.fillStyle = color;
-                  ctx.fillRect(this.x, this.y, this.width, this.height);
-              }
-            }
-            this.newPos = function() {
-              this.y = this.y + this.speedY;
-              this.x = this.x + this.speedX;
-              this.hitCeiling();
-              this.hitBottom();
-            }
-            this.hitCeiling = function() {
-              if (this.y <= 0) {
-                this.y = 0;
-              }
-            }
-            this.hitBottom = function() {
-              var rockBottom = myGameArea.canvas.height - this.height;
-              if (this.y > rockBottom) {
-                this.y = rockBottom;
-              }
-            }
-        }
-        function updateGameArea() {
-            // var x, y, maxSize, minSize, yPlacement;
-            // for (i = 0; i < myObstacles.length; i++) {
-            //     if (my)
-            // }
-            myGameArea.clear();
-            myGameArea.frameNo+=1;
-            if (myGameArea.frameNo == 1 || everyinterval(150)) {
-                x = myGameArea.canvas.width;
-                y = myGameArea.canvas.height;
-                minSize = 25;
-                maxSize = 150;
-                size = Math.floor(Math.random() * maxSize + minSize);
-                yPlacement = Math.floor(Math.random() * (y - size + 10) - size + 10);
-                myObstacles.push(new component(size, size, "red", x, yPlacement));
-            }
-            for (i = 0; i < myObstacles.length; i++) {
-                myObstacles[i].x += -1;
-                myObstacles[i].update();
-            }
-            myScore.text = "SCORE: " + myGameArea.frameNo; 
-            myScore.update();
+		}
+		function handleKeyPress(e) {
+			//alert(e.keyCode)
+			if (e.keyCode == 119) {
+				myGamePiece.speedY = -10;
+			}
+			if (e.keyCode == 115) {
+				myGamePiece.speedY = +10;
+			}
+			if (e.keyCode == 32) {
+				// alert("myShots[i].x");
+				// shots will be 6px wide, height = myGamePiece.y + 12
+				// x = myGamePiece.x + myGamePiece.width, width = 12
+				xPlacement = myGamePiece.x + myGamePiece.width;
+				yPlacement = myGamePiece.y + 12;
+				// shot.speedX = 5;
+				// shot.speedY = 0;
+				shot = new component(6, 12, "yellow", xPlacement, yPlacement);
+				myShots.push(shot);
+				// alert("myShots[i].x");
+				
+			}
+		}
+		function handleKeyUp(e) {
+			myGamePiece.speedY = 0;
+		}
+		var myGameArea = {
+			canvas: document.getElementById("myCanvas"),
+			start: function () {
+				this.context = this.canvas.getContext("2d");
+				this.frameNo = 0;
+				this.interval = setInterval(updateGameArea, 20);
+			},
+			clear: function () {
+				this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+			}
+		}
+		function component(width, height, color, x, y, type) {
+			this.type = type;
+			this.score = 0;
+			this.width = width;
+			this.height = height;
+			this.speedX = 0;
+			this.speedY = 0;
+			this.x = x;
+			this.y = y;
+			this.update = function () {
+				ctx = myGameArea.context;
+				if (this.type == "text") {
+					ctx.font = this.width + " " + this.height;
+					ctx.fillStyle = color;
+					ctx.fillText(this.text, this.x, this.y);
+				} else {
+					ctx.fillStyle = color;
+					ctx.fillRect(this.x, this.y, this.width, this.height);
+				}
+			}
+			this.newPos = function () {
+				this.y = this.y + this.speedY;
+				this.x = this.x + this.speedX;
+				this.hitCeiling();
+				this.hitBottom();
+			}
+			this.hitCeiling = function () {
+				if (this.y <= 0) {
+					this.y = 0;
+				}
+			}
+			this.hitBottom = function () {
+				var rockBottom = myGameArea.canvas.height - this.height;
+				if (this.y > rockBottom) {
+					this.y = rockBottom;
+				}
+			}
+			// collision detect
+			this.crashWith = function (obj) {
+				let myRight = this.x + this.width;
+				let myLeft = this.x;
+				let myTop = this.y;
+				let myBottom = this.y + this.height;
+				let objRight = obj.x + obj.width;
+				let objLeft = obj.x;
+				let objTop = obj.y;
+				let objBottom = obj.y + obj.height;
+				crash = true;
+				if (myRight < objLeft || myTop > objBottom || myBottom < objTop || myLeft > objRight) {
+					crash = false;
+				}
+				return crash;
+			}
+		}
+		function updateGameArea() {
+			var x, y, maxSize, minSize, yPlacement;
+			for (i = 0; i < myObstacles.length; i++) {
+				for (j = 0; j < myShots.length; j++) {
+					if (myShots[j].crashWith(myObstacles[i])) {
+						// add wicked death animation
+						myShots.splice(j, 1);
+						myObstacles[i].hitPoints -= 1;
+						if (myObstacles[i].hitPoints <= 0) {
+							myObstacles.splice(i, 1);
+						}
+					}
+				}
+				if (myGamePiece.crashWith(myObstacles[i])) {
+					return;
+				}
+			}
+			myGameArea.clear();
+			myGameArea.frameNo += 1;
+			infoNum = Math.floor(Math.random() * 5);
+			if (myGameArea.frameNo == 1 || everyinterval(150)) {
+				x = myGameArea.canvas.width;
+				y = myGameArea.canvas.height;
+				minSize = 25;
+				maxSize = 150;
 
-            myGamePiece.newPos();
-            myGamePiece.update();
-        }
-        function everyinterval(n) {
-            if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
-            return false;
-        }
-        startGame();
-    </script>
+				// randomize size, between min and max values
+				size = Math.floor(Math.random() * maxSize + minSize);
+
+				// randomize y component of asteroid
+				yPlacement = Math.floor(Math.random() * (y - size + 10) - size + 10);
+
+				// declare new asteroid component
+				asteroid = new component(size, size, "red", x, yPlacement);
+
+				// define hit points of asteroid
+				if (size > 70) {
+					asteroid.hitPoints = 2;
+				} else {
+					asteroid.hitPoints = 1;
+				}
+
+				// random speedY to asteroid
+				asteroid.speedY = Math.random() - 0.5;
+				// add it to list
+				myObstacles.push(asteroid);
+			}
+			for (i = 0; i < myObstacles.length; i++) {
+				myObstacles[i].x += -3;
+				myObstacles[i].y += myObstacles[i].speedY;
+				myObstacles[i].update();
+			}
+			for (i = 0; i < myShots.length; i++) {
+				myShots[i].x += 5;
+				myShots[i].update();
+			}
+			// here we trim our object lists
+			if (myShots.length > 80) {
+				myShots = myShots.slice(4);
+			}
+			if (myObstacles.length > 10) {
+				myObstacles = myObstacles.slice(4);
+			}
+			myScore.text = "SCORE: " + myGameArea.frameNo;
+			myScore.update();
+
+			myGamePiece.newPos();
+			myGamePiece.update();
+		}
+		function everyinterval(n) {
+			if ((myGameArea.frameNo / n) % 1 == 0) { return true; }
+			return false;
+		}
+		startGame();
+	</script>
 </body>
+
 </html>
